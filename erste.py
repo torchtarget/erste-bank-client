@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import requests
-import json
-import settings
-import os
 import re
-from datetime import date
 import rsa
 import binascii
-from datetime import timedelta
-from django.utils.functional import cached_property
+from cached_property import cached_property
 
 class ErsteClient(object):
     def __init__(self, username, password, iban=None, account_id=None):
@@ -17,7 +12,8 @@ class ErsteClient(object):
         self.password = password
         self.iban = iban
         self._account_id = account_id
-
+        self.data=None
+        
     @cached_property
     def access_token(self):
         def RSA(n, e, salt, password):
@@ -71,9 +67,9 @@ class ErsteClient(object):
     def account_id(self):
         if not self._account_id:
             r = requests.get('https://api.sparkasse.at/proxy/g/api/my/accounts', headers={'Authorization': 'bearer %s' % self.access_token})
-            data = r.json()
+            self.data = r.json() 
             # print 'data: ', data
-            for account in data['collection']:
+            for account in self.data['collection']:
                 accountno = account.get('accountno')
                 if accountno and accountno.get('iban') == self.iban:
                     self._account_id = account['id']
@@ -89,4 +85,9 @@ class ErsteClient(object):
                 'id': self.account_id,
             })
         return r.text[1:]
-        
+    
+    def get_data(self):
+            if (self.data is None):
+                r = requests.get('https://api.sparkasse.at/proxy/g/api/my/accounts', headers={'Authorization': 'bearer %s' % self.access_token})
+                self.data = r.json()
+            return self.data

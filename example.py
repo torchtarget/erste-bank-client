@@ -13,6 +13,7 @@ def main():
     begin_date = date.today()-timedelta(days=5)
     end_date = date.today()
     csv_data = client.get_csv(begin_date, end_date)
+    print(client.data['collection'][2].get('card'))
     print(csv_data)
     
 if __name__ == '__main__':

@@ -67,7 +67,8 @@ class ErsteClient(object):
     def account_id(self):
         if not self._account_id:
             r = requests.get('https://api.sparkasse.at/proxy/g/api/my/accounts', headers={'Authorization': 'bearer %s' % self.access_token})
-            self.data = r.json() 
+            self.data = r.json()
+            print("we are doing acount)id") 
             # print 'data: ', data
             for account in self.data['collection']:
                 accountno = account.get('accountno')
@@ -91,3 +92,17 @@ class ErsteClient(object):
                 r = requests.get('https://api.sparkasse.at/proxy/g/api/my/accounts', headers={'Authorization': 'bearer %s' % self.access_token})
                 self.data = r.json()
             return self.data
+    
+    def get_accounts_balance(self,account_index=0):
+        '''Get basics from account Balance, '''
+        # No obviousy key which describe account 
+        account = self.data['collction'][account_index]
+        account_balance=float(account.get('balance'.get('value')))/(10**float(account.get('balance'.get('precision')))))
+        
+        print(account)
+        if(account.get('typeI18n')== "Girokonto"):
+            
+            
+            
+    def get_no_accounts(self):
+          return (len)

@@ -9,13 +9,12 @@ from cached_property import cached_property
 
 
 class ErsteClient(object):
-    def __init__(self, username, password, iban=None, account_id=None, account_index=0):
+    def __init__(self, username, password, iban=None, account_id=None, account_index=None):
         """Setup the Erste Client Object - setting username and password and setting up the account."""
         self.username = username
         self.password = password
         """Account index needed for credit card accoutns as they ahve no iban"""
-        self.account_index = 0
-
+        self._account_index = account_index
         self._data = None
         self._iban = self.set_iban(iban) # Not always consist with index be careful when using
         self._account_id = self.set_account_id(account_id) # Not always consist with index be careful when using
@@ -71,12 +70,20 @@ class ErsteClient(object):
             return token
 
     # print r.text.encode('utf-8')
-
+    @property
+    def account_index(self):
+        if not self._account_index:
+            self._account_index = 0
+            self.set_iban(self._iban)
+            self.set_account_id(self._account_id)
+            print("We are here")
+        return(self._account_index)
 
     @property
     def account_id(self):
-        # Assume self..accountindex is always correct
-        self._account_id = self.data['collection'][self.account_index].get('id')
+        # If an index exists we should check if that is correct
+        if self._account_index:
+            self._account_id = self.data['collection'][self.account_index].get('id')
         return(self._account_id)
 
     @property
@@ -100,13 +107,20 @@ class ErsteClient(object):
 
     def set_account_id(self, account_id):
         """Checks if the account_id exists and sets the account_index for this account. Returns none if no iban found."""
-        self._account_id = None
-        if account_id:
-            i = 0
-            for account in self.data['collection']:
-                if account.get('id') == account_id:
-                    self.account_index = i
-        return(self.account_id)
+        myid = account_id
+        if self._account_index:
+            self._account_id = None
+            if account_id:
+                i = 0
+                for account in self.data['collection']:
+                    if account.get('id') == account_id:
+                        self.account_index = i
+                        myid = self.account_id
+                    else:
+                        myid=None
+        self._account_id = myid
+        return(self._account_id)
+
 
 
     def set_iban(self, iban):
@@ -119,7 +133,10 @@ class ErsteClient(object):
                 i = i+1
                 if accountno and accountno.get('iban') == iban:
                     self.account_index = i
-        return(self.iban)
+            return(self.iban)
+        else:
+            return(iban)
+
 
 
     def get_csv(self, start_date, end_date):
@@ -132,6 +149,7 @@ class ErsteClient(object):
                 'id': self.account_id,
             })
         return r.text[1:]
+
 
 
     def get_Balance(self):

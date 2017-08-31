@@ -1,12 +1,16 @@
 # erste-bank-client
 
-This is a python client for the Erste Bank (Austrian Bank) that allows you to download account statements (Kontoauszüge) as a csv file. It uses George, therefore, the Verfüger needs to be freigeschaltet for George.
+This is a python client for the Erste Bank (Austrian Bank) that allows you to download account statements (Kontoauszüge) as a csv file. It uses George, therefore, the Verfüger needs to be freigeschaltet for George. This is beased forked from AngelVol
 ### Simple usage:
 ```python
 from erste import ErsteClient
-iban = 'XXX' # IBAN of your Erste Bank account
 username = 'XXX' # please fill in your Verfügernummer
 password = 'XXX' # please fill in your George password
+optional
+iban ='XXX' # the iban number of the account you want to use
+account_id ='XXX' # the iban number of the account you want to use.  
+account_index ='X'  #This an in internal index which allows you to access the accounts in the order they come.  Allows for easy access to credit card and ivnetment account where theyre might not be an ibam
+
 
 client = ErsteClient(username, password, iban=iban)
 
@@ -15,19 +19,9 @@ end_date = date.today()
 csv_data = client.get_csv(begin_date, end_date)
 ```
 
-The above example makes an additional API call to get the internal account id from the iban. For better performance, find the internal account id like this:
+Performance maintainted with using account_id (a bit messy, would prefere a neater approach)
 
-```python
-client = ErsteClient(username, password, iban=iban)
-print client.account_id
-```
 
-And then use the account_id instead of IBAN. Initialization of ErsteClient changes to:
-
-```python
-client = ErsteClient(username, password, account_id=account_id)
-```
-This is recommended for better performance.
 ### Prerequisites
 ```bash
 pip install rsa requests

@@ -97,12 +97,10 @@ class ErsteClient(object):
         '''Get basics from account Balance, '''
         # No obviousy key which describe account 
         account = self.data['collction'][account_index]
-        account_balance=float(account.get('balance'.get('value')))/(10**float(account.get('balance'.get('precision')))))
+        account_balance=float(account.get('balance'.get('value')))/(10**float(account.get('balance'.get('precision'))))
         
-        print(account)
-        if(account.get('typeI18n')== "Girokonto"):
+        return(account_balance)
             
             
             
-    def get_no_accounts(self):
-          return (len)
+    
